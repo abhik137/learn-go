@@ -31,7 +31,7 @@
     - [Exercise: Loops and Functions](#exercise-loops-and-functions)
     - [Switch](#switch)
     - [Switch evaluation order](#switch-evaluation-order)
-    - [Switch with no condition](#switch-with-no-condition)
+    - [Switch with no expression](#switch-with-no-expression)
     - [Defer](#defer)
     - [Stacking defers](#stacking-defers)
   - [More types: structs, slices, and maps.](#more-types-structs-slices-and-maps)
@@ -50,6 +50,9 @@
     - [Creating a slice with make](#creating-a-slice-with-make)
     - [Slices of slices](#slices-of-slices)
     - [Appending to a slice](#appending-to-a-slice)
+    - [Range](#range)
+    - [Range continued](#range-continued)
+    - [Exercise: Slices](#exercise-slices)
 - [Methods and interfaces](#methods-and-interfaces)
 - [Concurrency](#concurrency)
 
@@ -433,7 +436,7 @@ package main
 import "fmt"
 
 func main() {
-    sumsum := 0
+    sum := 0
     for i := 0; i < 10; i++ {
         sum += i
     }
@@ -528,6 +531,7 @@ func pow(x, n, lim float64) float64 {
         return v
     }
     return lim
+    // return v    // undefined: v
 }
 
 func main() {
@@ -727,12 +731,12 @@ func main() {
 }
 ```
 
-### Switch with no condition
+### Switch with no expression
 
-Switch without a ~~condition~~ *value* is the same as `switch true`.
+Switch without an expression is the same as `switch true`.
 
-> What is a switch condition?
-> It's a `value` rather than a condition. The case statements are excuted when they match the switch value. In absence of value, the case statements are compared to `true` i.e. any condition can be used in the case statements instead of writing a long `if-else` chain
+> What is a switch expression?
+> The case statements are excuted when they match the switch expression value. In absence of value, the case statements are compared to `true` i.e. any condition can be used in the case statements instead of writing a long `if-else` chain
 
 This construct can be a clean way to write long if-then-else chains.
 
@@ -756,6 +760,7 @@ func main() {
     }
 }
 ```
+
 [Go wiki Switch](https://github.com/golang/go/wiki/Switch)
 
 ### Defer
@@ -837,13 +842,13 @@ p = &i
 The `*` operator denotes the pointer's underlying value.
 
 ```go
-fmt.Println(*p) // read i through the pointer p
-*p = 21         // set i through the pointer p
+fmt.Println(*p) // read (value of) i through the pointer p
+*p = 21         // set (value of) i through the pointer p
 ```
 
 This is known as "dereferencing" or "indirecting".
 
-Unlike C, Go has no pointer arithmetic.
+Unlike C, Go has **no pointer arithmetic**.
 
 ```go
 package main
@@ -867,6 +872,7 @@ func main() {
 ```
 
 Output:
+
 ```go
 0x40e020
 42
@@ -933,8 +939,8 @@ type Vertex struct {
 
 func main() {
     v := Vertex{1, 2}
-    p := &v
-    p.X = 1e9
+    p := &v         // address of v
+    p.X = 1e9       // p.X is works instead of (*p).X, but NOT *p.X
     fmt.Println(v)  // {1000000000 2}
 }
 ```
@@ -1027,7 +1033,7 @@ A slice does not store any data, it just describes a section of an underlying ar
 
 Changing the elements of a slice modifies the corresponding elements of its underlying array.
 
-Other slices that share the same underlying array will see those changes.
+**Other slices that share the same underlying array will see those changes.**
 
 ```go
 package main
@@ -1091,13 +1097,14 @@ func main() {
 
 ### Slice defaults
 
-When slicing, you may omit the high or low bounds to use their defaults instead.
+When slicing an existing array, you may omit the high or low bounds to use their defaults instead.
 
 The default is zero for the low bound and the length of the slice for the high bound.
 
-For the array  
+For the array defined as  
 `var a [10]int`  
 these slice expressions are equivalent:
+
 ```go
 a[0:10]
 a[:10]
@@ -1151,14 +1158,15 @@ func main() {
     s = s[:0]
     printSlice(s)
 
+    // Extend its length.
     s = s[:6]
     printSlice(s)
 
-    // Extend its length.
+    // Limit its length
     s = s[:4]
     printSlice(s)
-counting from the first element in the slice
-    // Drop its first two values.
+
+    // Drop its first two values. (reduce capacity)
     s = s[2:]
     printSlice(s)
 
@@ -1281,7 +1289,9 @@ func main() {
         fmt.Printf("%s\n", strings.Join(board[i], " "))
     }
 }
+
 ```
+
 Output:
 
 ```go
@@ -1292,9 +1302,167 @@ _ _ O
 
 ### Appending to a slice
 
-It is common to append new elements to a slice, and so Go provides a built-in `append` function. The [documentation](https://golang.org/pkg/builtin/#append) of the built-in package describes `append`.
+It is common to append new elements to a slice, and so Go provides a built-in `append` function. The [documentation](https://golang.org/pkg/builtin/#append) of the built-in package describes `append`.  
+`func append(s []T, vs ...T) []T`  
+The first parameter `s` of `append` is a slice of type `T`, and the rest are `T` values to append to the slice.
 
+The resulting value of `append` is a slice containing all the elements of the original slice plus the provided values.
 
+If the backing array of `s` is too small to fit all the given values a bigger array will be allocated. The returned slice will point to the newly allocated array.
+
+(To learn more about slices, read the [Slices: usage and internals](https://blog.golang.org/slices-intro) article.)
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    var s []int
+    printSlice(s)       // len=0 cap=0 []
+
+    // append works on nil slices.
+    s = append(s, 0)
+    printSlice(s)       // len=1 cap=1 [0]
+
+    // The slice grows as needed.
+    s = append(s, 1)
+    printSlice(s)       // len=2 cap=2 [0 1]
+
+    // We can add more than one element at a time.
+    s = append(s, 2, 3, 4)
+    printSlice(s)       // len=5 cap=6 [0 1 2 3 4]
+}
+
+func printSlice(s []int) {
+    fmt.Printf("len=%d cap=%d %v\n", len(s), cap(s), s)
+}
+```
+
+### Range
+
+The `range` form of the f`or loop iterates over a slice or map.(this is like a forEach loop)
+
+When ranging over a slice, two values are returned for each iteration. The first is the index, and the second is a copy of the element at that index.
+
+```go
+package main
+
+import "fmt"
+
+var pow = []int{1, 2, 4, 8, 16, 32, 64, 128}
+
+func main() {
+    for i, v := range pow {
+        fmt.Printf("2**%d = %d\n", i, v)
+    }
+}
+```
+
+Output:
+
+```text
+2**0 = 1
+2**1 = 2
+2**2 = 4
+2**3 = 8
+2**4 = 16
+2**5 = 32
+2**6 = 64
+2**7 = 128
+```
+
+### Range continued
+
+You can skip the index or value by assigning to `_`.
+
+```go
+for i, _ := range pow
+for _, value := range pow
+```
+
+If you only want the index, you can omit the second variable.
+
+```go
+for i := range pow
+```
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    pow := make([]int, 10)
+    for i := range pow {
+        pow[i] = 1 << uint(i) // == 2**i
+    }
+    for _, value := range pow {
+        fmt.Printf("%d\n", value)
+    }
+}
+```
+
+Output:
+
+```text
+1
+2
+4
+8
+16
+32
+64
+128
+256
+512
+```
+
+### Exercise: Slices
+
+Implement `Pic`. It should return a slice of length `dy`, each element of which is a slice of `dx` 8-bit unsigned integers. When you run the program, it will display your picture, interpreting the integers as grayscale (well, bluescale) values.
+
+The choice of image is up to you. Interesting functions include `(x+y)/2`, `x*y`, `x^y`, `(x^y)*(x^y)`, and `x*x+y*y` .
+
+(You need to use a loop to allocate each `[]uint8` inside the `[][]uint8`.)
+
+(Use `uint8(intValue)` to convert between types.)
+
+[Explanation of the Exercise](https://stackoverflow.com/questions/25459474/go-tour-slices-exercise-logic)
+
+```go
+package main
+
+import (
+    "golang.org/x/tour/pic"
+)
+
+func Pic(dx, dy int) [][]uint8 {
+    pic := make([][]uint8, dy)
+    //for i:=0; i<len(pic); i++ {
+    //    fmt.Printf("%d\n", i)
+    //}
+    for y:= range pic {
+        pic[y] = make([]uint8, dx)
+        for x:=range pic[y] {
+            pic[y][x] = uint8((x ^ y) * (x ^ y))
+        }
+    }
+    return pic
+}
+
+func main() {
+    pic.Show(Pic)
+}
+```
+
+Output:
+
+![Output 1](./img/slices-pattern.png "(x ^ y) * (x ^ y)")
+
+Use [this site](https://codebeautify.org/base64-to-image-converter) to covert base-64 text to image if needed.
+
+Documentation link of the [pic](https://pkg.go.dev/golang.org/x/tour/pic?tab=doc) package that generates the above image. Code available [here](https://github.com/golang/tour/tree/0608babe047d/pic)
 
 # Methods and interfaces
 
