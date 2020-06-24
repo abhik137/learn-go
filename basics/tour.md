@@ -10,6 +10,8 @@
 - [Basics](#basics)
   - [Package, variables and Functions](#package-variables-and-functions)
     - [Imports](#imports)
+    - [Exported names](#exported-names)
+    - [Functions](#functions)
     - [Multiple Results](#multiple-results)
     - [Named return values](#named-return-values)
     - [Variables](#variables)
@@ -34,7 +36,7 @@
     - [Switch with no expression](#switch-with-no-expression)
     - [Defer](#defer)
     - [Stacking defers](#stacking-defers)
-  - [More types: structs, slices, and maps.](#more-types-structs-slices-and-maps)
+  - [More types: structs, slices, and maps](#more-types-structs-slices-and-maps)
     - [Pointers](#pointers)
     - [Structs](#structs)
     - [Struct Fields](#struct-fields)
@@ -53,6 +55,15 @@
     - [Range](#range)
     - [Range continued](#range-continued)
     - [Exercise: Slices](#exercise-slices)
+    - [Maps](#maps)
+    - [Map Literals](#map-literals)
+    - [Map literals continued](#map-literals-continued)
+    - [Mutating Maps](#mutating-maps)
+    - [Exercise: Maps](#exercise-maps)
+    - [Function values](#function-values)
+    - [Function closures](#function-closures)
+    - [Relevant Functional Programming Concepts](#relevant-functional-programming-concepts)
+    - [Exercise: Fibonacci closure](#exercise-fibonacci-closure)
 - [Methods and interfaces](#methods-and-interfaces)
 - [Concurrency](#concurrency)
 
@@ -64,18 +75,21 @@ Learn the basic components of any Go program.
 
 ### Imports
 
-1. Multiple import statements
-   ```go
-    import "fmt"
-    import "math"
-    ```
-2. "Factored" import statement (preferred way)
-    ```go
-    import(
-        "fmt",
-        "math/rand"
-    )
-    ```
+Multiple import statements
+
+```go
+import "fmt"
+import "math"
+```
+
+2."Factored" import statement (preferred way)
+
+```go
+import(
+    "fmt",
+    "math/rand"
+)
+```
 
 ### Exported names
 
@@ -118,7 +132,9 @@ func main() {
 ```
 
 ### Multiple Results
-A function can return multiple values. Here, the `swap` function returns 2 strings.  
+
+A function can return multiple values. Here, the `swap` function returns 2 strings.
+
 ```go
 package main
 
@@ -135,6 +151,7 @@ func main() {
 ```
 
 ### Named return values
+
 Go's return values may be named. If so, they are treated as variables defined at the top of the function.
 These names should be used to document the meaning of the return values.  
 A return statement without arguments returns the named return values. This is known as a "naked" return.  
@@ -157,6 +174,7 @@ func main() {
 ```
 
 ### Variables
+
 The `var` statement declares a list of variables. As in function argument lists, the type is at last.  
 A `var` statement can be at package or function level. We see both in this example.
 
@@ -214,6 +232,7 @@ func main() {
 > [= vs :=](https://www.godesignpatterns.com/2014/04/assignment-vs-short-variable-declaration.html)
 
 ### Basic types
+
 Go's basic types are
 
 ```go
@@ -416,6 +435,7 @@ func main() {
 Learn how to control the flow of your code with conditionals, loops, switches and defers.
 
 ### For loop
+
 Go has only one looping construct, the `for` loop.
 
 The basic for loop has three components separated by semicolons:
@@ -536,7 +556,7 @@ func pow(x, n, lim float64) float64 {
 
 func main() {
     fmt.Println(
-        pow(3, 2, 10),  // 9 
+        pow(3, 2, 10),  // 9
         pow(3, 3, 20),  // 20
     )
 }
@@ -657,7 +677,6 @@ Sqrt: 2.23606797749979    Difference: 0.8218544151266947
 2.23606797749979
 ```
 
-
 **Note**: If you are interested in the details of the algorithm, the z² − x above is how far away z² is from where it needs to be (x), and the division by 2z is the derivative of z², to scale how much we adjust z by how quickly z² is changing. This general approach is called [Newton's method](https://en.wikipedia.org/wiki/Newton%27s_method). It works well for many functions but especially well for square root.
 
 More info on Newton's method:  
@@ -699,12 +718,14 @@ func main() {
 Switch cases evaluate cases from top to bottom, stopping when a case succeeds.
 
 (For example,
+
 ```go
 switch i {
 case 0:
 case f():
 }
 ```
+
 does not call `f` if `i==0`.)
 
 ```go
@@ -820,7 +841,7 @@ done
 0
 ```
 
-## More types: structs, slices, and maps.
+## More types: structs, slices, and maps
 
 Learn how to define types based on existing ones: this lesson covers structs, arrays, slices, and maps.
 
@@ -1418,6 +1439,9 @@ Output:
 512
 ```
 
+Article:
+[4 basic range loop (for-each) patterns](https://yourbasic.org/golang/for-loop-range-array-slice-map-channel/)
+
 ### Exercise: Slices
 
 Implement `Pic`. It should return a slice of length `dy`, each element of which is a slice of `dx` 8-bit unsigned integers. When you run the program, it will display your picture, interpreting the integers as grayscale (well, bluescale) values.
@@ -1439,10 +1463,15 @@ import (
 
 func Pic(dx, dy int) [][]uint8 {
     pic := make([][]uint8, dy)
-    //for i:=0; i<len(pic); i++ {
-    //    fmt.Printf("%d\n", i)
-    //}
-    for y:= range pic {
+    /* this works too
+    for i:=0; i<len(pic); i++ {
+       pic[i] = make([]uint8, dx)
+       for j:=0; j<len(pic[i]); j++ {
+           pic[i][j] = uint8(i*j)
+       }
+    }
+     */
+    for y:=range pic {
         pic[y] = make([]uint8, dx)
         for x:=range pic[y] {
             pic[y][x] = uint8((x ^ y) * (x ^ y))
@@ -1462,7 +1491,313 @@ Output:
 
 Use [this site](https://codebeautify.org/base64-to-image-converter) to covert base-64 text to image if needed.
 
-Documentation link of the [pic](https://pkg.go.dev/golang.org/x/tour/pic?tab=doc) package that generates the above image. Code available [here](https://github.com/golang/tour/tree/0608babe047d/pic)
+Documentation link of the [pic](https://pkg.go.dev/golang.org/x/tour/pic?tab=doc) package that generates the above image. Code available [here](https://github.com/golang/tour/tree/0608babe047d/pic)  
+
+[stackoverflow: iterating over a 2D slice in Go](https://stackoverflow.com/questions/37668224/iterating-over-over-a-2d-slice-in-go)  
+
+### Maps
+
+A map maps keys to values.
+
+The zero value of a map is `nil`. A `nil` map has no keys, nor can keys be added.
+
+The `make` function returns a map of the given type, initialized and ready for use.
+
+```go
+package main
+
+import "fmt"
+
+type Vertex struct {
+    Lat, Long float64
+}
+
+var m map[string]Vertex
+
+func main() {
+    m = make(map[string]Vertex)
+    m["Bell Labs"] = Vertex{
+        40.68433, -74.39967,
+    }
+    fmt.Println(m["Bell Labs"])     // {40.68433 -74.39967}
+}
+```
+
+### Map Literals
+
+Map literals are like struct literals, but the keys are required.
+
+```go
+package main
+
+import "fmt"
+
+type Vertex struct {
+    Lat, Long float64
+}
+
+var m = map[string]Vertex{
+    "Bell Labs": Vertex{
+        40.68433, -74.39967,
+    },
+    "Google": Vertex{
+        37.42202, -122.08408,
+    },
+}
+
+func main() {
+    fmt.Println(m)  // map[Bell Labs:{40.68433 -74.39967} Google:{37.42202 -122.08408}]
+}
+```
+
+### Map literals continued
+
+If the top-level type is just a type name, you can omit it from the elements of the literal.
+
+```go
+package main
+
+import "fmt"
+
+type Vertex struct {
+    Lat, Long float64
+}
+
+var m = map[string]Vertex{
+    "Bell Labs": {40.68433, -74.39967},
+    "Google":    {37.42202, -122.08408},
+}
+
+func main() {
+    fmt.Println(m)  // map[Bell Labs:{40.68433 -74.39967} Google:{37.42202 -122.08408}]
+}
+```
+
+### Mutating Maps
+
+Insert or update an element in map `m`:  
+`m[key] = elem`
+
+Retrieve an element:  
+`elem = m[key]`
+
+Delete an element:  
+`delete(m, key)`
+
+Test that a key is present with a two-value assignment:  
+`elem, ok = m[key]`
+
+If `key` is in `m`, `ok` is `true`. If not, `ok` is `false`.
+
+If `key` is not in the map, then `elem` is the zero value for the map's element type.
+
+**Note**: If `elem` or `ok` have not yet been declared you could use a short declaration form:  
+`elem, ok := m[key]`
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    m := make(map[string]int)
+
+    m["Answer"] = 42
+    fmt.Println("The value:", m["Answer"])          // The value: 42
+
+    m["Answer"] = 48
+    fmt.Println("The value:", m["Answer"])          // The value: 48
+
+    delete(m, "Answer")
+    fmt.Println("The value:", m["Answer"])          // The value: 0
+
+    v, ok := m["Answer"]
+    fmt.Println("The value:", v, "Present?", ok)    // The value: 0 Present? false
+}
+```
+
+### Exercise: Maps
+
+Implement `WordCount`. It should return a map of the counts of each “word” in the string `s`. The `wc.Test` function runs a test suite against the provided function and prints success or failure.
+
+You might find [strings.Fields](https://golang.org/pkg/strings/#Fields) helpful.
+
+```go
+package main
+
+import (
+    "golang.org/x/tour/wc"
+    "strings"
+    // "fmt"
+)
+
+func WordCount(s string) map[string]int {
+    words := strings.Fields(s)
+    m := make(map[string]int)
+    for _, word := range words {
+        // fmt.Println(word)
+        v, ok := m[word]
+        if ok {
+            m[word] = v+1
+        } else {
+            m[word] = 1
+        }
+    }
+    // return map[string]int{"x": 1}
+    return m
+}
+
+func main() {
+    wc.Test(WordCount)
+}
+```
+
+Output:
+
+```text
+PASS
+ f("I am learning Go!") =
+  map[string]int{"Go!":1, "I":1, "am":1, "learning":1}
+PASS
+ f("The quick brown fox jumped over the lazy dog.") =
+  map[string]int{"The":1, "brown":1, "dog.":1, "fox":1, "jumped":1, "lazy":1, "over":1, "quick":1, "the":1}
+PASS
+ f("I ate a donut. Then I ate another donut.") =
+  map[string]int{"I":2, "Then":1, "a":1, "another":1, "ate":2, "donut.":2}
+PASS
+ f("A man a plan a canal panama.") =
+  map[string]int{"A":1, "a":2, "canal":1, "man":1, "panama.":1, "plan":1}
+```
+
+### Function values
+
+Functions are values too. They can be passed around just like other values.
+
+Function values may be used as function arguments and return values.
+
+```go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+func compute(fn func(float64, float64) float64) float64 {
+    return fn(3, 4)
+}
+
+func main() {
+    hypot := func(x, y float64) float64 {
+        return math.Sqrt(x*x + y*y)
+    }
+    fmt.Println(hypot(5, 12))       // 13
+
+    fmt.Println(compute(hypot))     // 5
+    fmt.Println(compute(math.Pow))  // 81
+}
+```
+
+### Function closures
+
+Go functions may be closures. A closure is a function value that references variables from outside its body. The function may access and assign to the referenced variables; in this sense the function is "bound" to the variables.
+
+For example, the `adder` function returns a closure. Each closure is bound to its own `sum` variable.
+
+```go
+package main
+
+import "fmt"
+
+func adder() func(int) int {
+    sum := 0
+    return func(x int) int {
+        sum += x
+        return sum
+    }
+}
+
+func main() {
+    pos, neg := adder(), adder()
+    for i := 0; i < 10; i++ {
+        fmt.Println(
+            pos(i),
+            neg(-2*i),
+        )
+    }
+}
+```
+
+Output:
+
+```text
+0 0
+1 -2
+3 -6
+6 -12
+10 -20
+15 -30
+21 -42
+28 -56
+36 -72
+45 -90
+```
+
+### Relevant Functional Programming Concepts
+
+[Closure: Wikipedia](https://en.wikipedia.org/wiki/Closure_(computer_programming))  
+[What is a Closure? - Stackoverflow](https://stackoverflow.com/questions/36636/what-is-a-closure)  
+[Closure Because of What it Can Do or Because it Does - Stackoverflow](https://stackoverflow.com/questions/4103750/closure-because-of-what-it-can-do-or-because-it-does/4103834#4103834)  
+[What is 'Currying'? - Stackoverflow](https://stackoverflow.com/questions/36314/what-is-currying)  
+[Currying: Wikipedia](https://en.wikipedia.org/wiki/Currying)  
+[Higher Order Functions and Currying: Geeksforgeeks](https://www.geeksforgeeks.org/higher-order-functions-currying/)  
+
+### Exercise: Fibonacci closure
+
+Let's have some fun with functions.
+
+Implement a `fibonacci` function that returns a function (a closure) that returns successive fibonacci numbers (0, 1, 1, 2, 3, 5, ...).
+
+```go
+package main
+
+import "fmt"
+
+// fibonacci is a function that returns
+// a function that returns an int.
+func fibonacci() func() int {
+    f1, f2 := 0, 1
+    return func() int {
+        f := f1
+        f1, f2 = f2, f1+f2
+        return f
+    }
+}
+
+func main() {
+    f := fibonacci()
+    for i := 0; i < 10; i++ {
+        fmt.Println(f())
+    }
+}
+
+```
+
+Output:
+
+```text
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+```
+
 
 # Methods and interfaces
 
