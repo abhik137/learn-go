@@ -1,6 +1,7 @@
 # Resources
 
 [A Tour of GO](https://tour.golang.org)  
+[Go Tour github repo](https://github.com/golang/tour)  
 [Inside the Go Playground - Architecture](https://blog.golang.org/playground)
 
 # ToC
@@ -65,6 +66,31 @@
     - [Relevant Functional Programming Concepts](#relevant-functional-programming-concepts)
     - [Exercise: Fibonacci closure](#exercise-fibonacci-closure)
 - [Methods and interfaces](#methods-and-interfaces)
+  - [Methods](#methods)
+  - [Methods are functions](#methods-are-functions)
+  - [Methods continued](#methods-continued)
+  - [Pointer receivers](#pointer-receivers)
+  - [Pointers and functions](#pointers-and-functions)
+  - [Methods and pointer indirection](#methods-and-pointer-indirection)
+  - [Methods and pointer indirection (2)](#methods-and-pointer-indirection-2)
+  - [Choosing a value or pointer receiver](#choosing-a-value-or-pointer-receiver)
+  - [Interfaces](#interfaces)
+  - [Interfaces are implemented implicitly](#interfaces-are-implemented-implicitly)
+  - [Interface values](#interface-values)
+  - [Interface values with nil underlying values](#interface-values-with-nil-underlying-values)
+  - [Nil interface values](#nil-interface-values)
+  - [The empty interface](#the-empty-interface)
+  - [Type assertions](#type-assertions)
+  - [Type switches](#type-switches)
+  - [Stringers](#stringers)
+  - [Exercise: Stringers](#exercise-stringers)
+  - [Errors](#errors)
+  - [Exercise: Errors](#exercise-errors)
+  - [Readers](#readers)
+  - [Exercise: Readers](#exercise-readers)
+  - [Exercise: rot13Reader](#exercise-rot13reader)
+  - [Images](#images)
+  - [Exercise: Images](#exercise-images)
 - [Concurrency](#concurrency)
 
 # Basics
@@ -622,16 +648,18 @@ import (
     "math"
 )
 
+const delta = 1.0e-10
+
 func Sqrt(x float64) float64 {
     /* function to be implemented */
-    z := 1.0    // guess
-    // z := (x/2.0)    // guess 2 -> works
-    // z := x    // guess 3 -> works
+    z := 1.0 // guess
+    // z := (x / 2.0) // guess no. 2 -> works
+    // z := x // guess no. 3 -> works
     for i := 0; i < 10; i++ {
-        z -= (z*z - x) / (2*z)
-        fmt.Printf("Sqrt: %v",z)
-        fmt.Printf("\tDifference: %v\n", z - math.Sqrt(2))    // Difference from actual Sqrt
-        if diff := z - math.Sqrt(2); diff < 1.0e-4 {
+        z -= (z*z - x) / (2 * z)
+        fmt.Printf("Sqrt: %v", z)
+        fmt.Printf("\tDifference: %v\n", z-math.Sqrt(x)) // Difference from actual Sqrt
+        if diff := z - math.Sqrt(x); diff < delta {
             break
         }
     }
@@ -648,33 +676,23 @@ func main() {
 Output:
 
 ```go
-
 Sqrt: 1.5    Difference: 0.08578643762690485
 Sqrt: 1.4166666666666667    Difference: 0.002453104293571595
 Sqrt: 1.4142156862745099    Difference: 2.1239014147411694e-06
-1.4142156862745099
-Sqrt: 2    Difference: 0.5857864376269049
-Sqrt: 1.75    Difference: 0.33578643762690485
-Sqrt: 1.7321428571428572    Difference: 0.31792929476976206
-Sqrt: 1.7320508100147276    Difference: 0.31783724764163246
-Sqrt: 1.7320508075688772    Difference: 0.31783724519578205
-Sqrt: 1.7320508075688774    Difference: 0.31783724519578227
-Sqrt: 1.7320508075688772    Difference: 0.31783724519578205
-Sqrt: 1.7320508075688774    Difference: 0.31783724519578227
-Sqrt: 1.7320508075688772    Difference: 0.31783724519578205
-Sqrt: 1.7320508075688774    Difference: 0.31783724519578227
-1.7320508075688774
-Sqrt: 3    Difference: 1.5857864376269049
-Sqrt: 2.3333333333333335    Difference: 0.9191197709602383
-Sqrt: 2.238095238095238    Difference: 0.823881675722143
-Sqrt: 2.2360688956433634    Difference: 0.8218553332702683
-Sqrt: 2.236067977499978    Difference: 0.821854415126883
-Sqrt: 2.23606797749979    Difference: 0.8218544151266947
-Sqrt: 2.23606797749979    Difference: 0.8218544151266947
-Sqrt: 2.23606797749979    Difference: 0.8218544151266947
-Sqrt: 2.23606797749979    Difference: 0.8218544151266947
-Sqrt: 2.23606797749979    Difference: 0.8218544151266947
-2.23606797749979
+Sqrt: 1.4142135623746899    Difference: 1.5947243525715749e-12
+1.4142135623746899
+Sqrt: 2    Difference: 0.2679491924311228
+Sqrt: 1.75    Difference: 0.017949192431122807
+Sqrt: 1.7321428571428572    Difference: 9.204957398001312e-05
+Sqrt: 1.7320508100147276    Difference: 2.445850411092465e-09
+Sqrt: 1.7320508075688772    Difference: 0
+1.7320508075688772
+Sqrt: 3    Difference: 0.7639320225002102
+Sqrt: 2.3333333333333335    Difference: 0.09726535583354368
+Sqrt: 2.238095238095238    Difference: 0.0020272605954483325
+Sqrt: 2.2360688956433634    Difference: 9.18143573613861e-07
+Sqrt: 2.236067977499978    Difference: 1.8829382497642655e-13
+2.236067977499978
 ```
 
 **Note**: If you are interested in the details of the algorithm, the z² − x above is how far away z² is from where it needs to be (x), and the division by 2z is the derivative of z², to scale how much we adjust z by how quickly z² is changing. This general approach is called [Newton's method](https://en.wikipedia.org/wiki/Newton%27s_method). It works well for many functions but especially well for square root.
@@ -1798,10 +1816,1116 @@ Output:
 34
 ```
 
-
 # Methods and interfaces
 
 This lesson covers methods and interfaces, the constructs that define objects and their behavior.
+
+## Methods
+
+Go does not have classes. However, you can define methods on types.
+
+A method is a function with a special *receiver* argument.
+
+The receiver appears in its own argument list between the `func` keyword and the method name.
+
+In this example, the `Abs` method has a receiver of type `Vertex` named `v`.
+
+```go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+type Vertex struct {
+    X, Y float64
+}
+
+func (v Vertex) Abs() float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func main() {
+    v := Vertex{3, 4}
+    fmt.Println(v.Abs())    // 5
+}
+```
+
+## Methods are functions
+
+Remember: a method is just a function with a receiver argument.
+
+Here's `Abs` written as a regular function with no change in functionality.
+
+```go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+type Vertex struct {
+    X, Y float64
+}
+
+func Abs(v Vertex) float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func main() {
+    v := Vertex{3, 4}
+    fmt.Println(Abs(v))     // 5
+}
+```
+
+## Methods continued
+
+You can declare a method on non-struct types, too.
+
+In this example we see a numeric type `MyFloat` with an `Abs` method.
+
+You can only declare a method with a receiver whose type is defined in the same package as the method. You cannot declare a method with a receiver whose type is defined in another package (which includes the built-in types such as `int`).
+
+```go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+type MyFloat float64
+
+func (f MyFloat) Abs() float64 {
+    if f < 0 {
+        return float64(-f)
+    }
+    return float64(f)
+}
+
+func main() {
+    f := MyFloat(-math.Sqrt2)
+    fmt.Println(f.Abs())        // 1.4142135623730951
+}
+```
+
+**Q:** What exactly is a `type` in Go?  
+**A:** TODO
+
+## Pointer receivers
+
+You can declare methods with pointer receivers.
+
+This means the receiver type has the literal syntax `*T` for some type `T`. (Also, `T` cannot itself be a pointer such as `*int`.)
+
+For example, the `Scale` method here is defined on `*Vertex`.
+
+Methods with pointer receivers can modify the value to which the receiver points (as `Scale` does here). Since methods often need to modify their receiver, pointer receivers are more common than value receivers.
+
+Try removing the `*` from the declaration of the `Scale` function on line 16 and observe how the program's behavior changes. => Program behaves as if `Scale` wasn't there, i.e. `Scale` has no effect as it operates on a local copy of `Vertex v`, not on the original. Ans is `5` instead of `50`
+
+With a value receiver, the `Scale` method **operates on a copy of the original (pass-by-value)** `Vertex` value. (This is the same behavior as for any other function argument.) The `Scale` method **must have a pointer receiver to change the Vertex value** declared in the `main` function.
+
+```go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+type Vertex struct {
+    X, Y float64
+}
+
+func (v Vertex) Abs() float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func (v *Vertex) Scale(f float64) {
+    v.X = v.X * f
+    v.Y = v.Y * f
+}
+
+func main() {
+    v := Vertex{3, 4}
+    v.Scale(10)
+    fmt.Println(v.Abs())    // 50
+}
+```
+
+## Pointers and functions
+
+Here we see the `Abs` and `Scale` methods rewritten as functions.
+
+Again, try removing the `*` from line 16. Can you see why the behavior changes? What else did you need to change for the example to compile?
+
+(If you're not sure, continue to the next page.)
+
+```go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+type Vertex struct {
+    X, Y float64
+}
+
+func Abs(v Vertex) float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func Scale(v *Vertex, f float64) {
+    v.X = v.X * f
+    v.Y = v.Y * f
+}
+
+func main() {
+    v := Vertex{3, 4}
+    Scale(&v, 10)
+    fmt.Println(Abs(v))     // 50
+}
+```
+
+## Methods and pointer indirection
+
+Comparing the previous two programs, you might notice that functions with a pointer argument must take a pointer:
+
+```go
+var v Vertex
+ScaleFunc(v, 5)  // Compile error!
+ScaleFunc(&v, 5) // OK
+```
+
+while methods with pointer receivers take either a value or a pointer as the receiver when they are called:
+
+```go
+var v Vertex
+v.Scale(5)  // OK
+p := &v
+p.Scale(10) // OK
+```
+
+For the statement `v.Scale(5)`, even though `v` is a value and not a pointer, the method with the pointer receiver is called automatically. That is, as a convenience, Go interprets the statement `v.Scale(5)` as `(&v).Scale(5)` since the `Scale` method has a pointer receiver.
+
+```go
+package main
+
+import "fmt"
+
+type Vertex struct {
+    X, Y float64
+}
+
+func (v *Vertex) Scale(f float64) {
+    v.X = v.X * f
+    v.Y = v.Y * f
+}
+
+func ScaleFunc(v *Vertex, f float64) {
+    v.X = v.X * f
+    v.Y = v.Y * f
+}
+
+func main() {
+    v := Vertex{3, 4}
+    v.Scale(2)
+    ScaleFunc(&v, 10)
+
+    p := &Vertex{4, 3}
+    p.Scale(3)
+    ScaleFunc(p, 8)
+
+    fmt.Println(v, p)   // {60 80} &{96 72}
+}
+```
+
+## Methods and pointer indirection (2)
+
+The equivalent thing happens in the reverse direction.
+
+Functions that take a value argument must take a value of that specific type:
+
+```go
+var v Vertex
+fmt.Println(AbsFunc(v))  // OK
+fmt.Println(AbsFunc(&v)) // Compile error!
+```
+
+while methods with value receivers take either a value or a pointer as the receiver when they are called:
+
+```go
+var v Vertex
+fmt.Println(v.Abs()) // OK
+p := &v
+fmt.Println(p.Abs()) // OK
+```
+
+In this case, the method call `p.Abs()` is interpreted as `(*p).Abs()`.
+
+```go
+/* methods-with-pointer-receivers.go */
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+type Vertex struct {
+    X, Y float64
+}
+
+func (v Vertex) Abs() float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func AbsFunc(v Vertex) float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func main() {
+    v := Vertex{3, 4}
+    fmt.Println(v.Abs())        // 5
+    fmt.Println(AbsFunc(v))     // 5
+
+    p := &Vertex{4, 3}
+    fmt.Println(p.Abs())        // 5
+    fmt.Println(AbsFunc(*p))    // 5
+}
+```
+
+## Choosing a value or pointer receiver
+
+There are two reasons to use a pointer receiver.
+
+- The first is so that the method can modify the value that its receiver points to.
+- The second is to avoid copying the value on each method call. This can be more efficient if the receiver is a large struct, for example.
+
+In this example, both `Scale` and `Abs` are with receiver type `*Vertex`, even though the `Abs` method needn't modify its receiver.
+
+In general, all methods on a given type should have either value or pointer receivers, **but not a mixture of both**. (We'll see why over the next few sections.)
+
+```go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+type Vertex struct {
+    X, Y float64
+}
+
+func (v *Vertex) Scale(f float64) {
+    v.X = v.X * f
+    v.Y = v.Y * f
+}
+
+func (v *Vertex) Abs() float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+
+func main() {
+    v := &Vertex{3, 4}
+    fmt.Printf("Before scaling: %+v, Abs: %v\n", v, v.Abs())    // Before scaling: &{X:3 Y:4}, Abs: 5
+    v.Scale(5)
+    fmt.Printf("After scaling: %+v, Abs: %v\n", v, v.Abs())     // After scaling: &{X:15 Y:20}, Abs: 25
+}
+```
+
+## Interfaces
+
+An *interface type* is defined as a set of method signatures.
+
+A value of interface type can hold any value that implements those methods.
+
+**Note**: There is an error in the example code on line 22. `Vertex` (the value type) doesn't implement `Abser` because the `Abs` method is defined only on `*Vertex` (the pointer type).
+
+```go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+type Abser interface {
+    Abs() float64
+}
+
+func main() {
+    var a Abser
+    f := MyFloat(-math.Sqrt2)
+    v := Vertex{3, 4}
+
+    a = f  // a MyFloat implements Abser
+    a = &v // a *Vertex implements Abser
+
+    // In the following line, v is a Vertex (not *Vertex)
+    // and does NOT implement Abser.
+    a = v // Error: Vertex (the value type) doesn't implement Abser because the Abs method is defined only on *Vertex (the pointer type).
+
+    fmt.Println(a.Abs())    // 5
+}
+
+type MyFloat float64
+
+func (f MyFloat) Abs() float64 {
+    if f < 0 {
+        return float64(-f)
+    }
+    return float64(f)
+}
+
+type Vertex struct {
+    X, Y float64
+}
+
+func (v *Vertex) Abs() float64 {
+    return math.Sqrt(v.X*v.X + v.Y*v.Y)
+}
+```
+
+## Interfaces are implemented implicitly
+
+A type implements an interface by implementing its methods. There is **no explicit declaration of intent**, no "implements" keyword.
+
+*Implicit interfaces decouple the definition of an interface from its implementation, which could then appear in any package without prearrangement.*
+
+```go
+// interfaces-are-satisfied-implicitly.go
+package main
+
+import "fmt"
+
+type I interface {
+    M()
+}
+
+type T struct {
+    S string
+}
+
+// This method means type T implements the interface I,
+// but we don't need to explicitly declare that it does so.
+func (t T) M() {
+    fmt.Println(t.S)    // hello
+}
+
+func main() {
+    var i I = T{"hello"}
+    i.M()
+}
+```
+
+## Interface values
+
+Under the hood, interface values can be thought of as a tuple of a value and a concrete type:  
+`(value, type)`
+
+An interface value holds a value of a specific underlying concrete type.
+
+Calling a method on an interface value executes the method of the same name on its underlying type.
+
+```go
+// interface-values.go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+type I interface {
+    M()
+}
+
+type T struct {
+    S string
+}
+
+func (t *T) M() {
+    fmt.Println(t.S)
+}
+
+type F float64
+
+func (f F) M() {
+    fmt.Println(f)
+}
+
+func main() {
+    var i I     // here `i` is the interface value and `*T`,`F` are the corresponding concrete types
+
+    i = &T{"Hello"}
+    describe(i)         // (&{Hello}, *main.T)
+    i.M()               // Hello
+
+    i = F(math.Pi)
+    describe(i)         // (3.    , main.F)
+    i.M()               // 3.    
+}
+
+func describe(i I) {
+    fmt.Printf("(%v, %T)\n", i, i)
+}
+
+```
+
+## Interface values with nil underlying values
+
+If the concrete value inside the interface itself is nil, the method will be called with a nil receiver.
+
+In some languages this would trigger a null pointer exception, but in Go it is common to write methods that gracefully handle being called with a nil receiver (as with the method `M` in this example.)
+
+Note that an interface value that holds a nil concrete value is itself non-nil.
+
+```go
+// interface-values-with-nil.go
+package main
+
+import "fmt"
+
+type I interface {
+    M()
+}
+
+type T struct {
+    S string
+}
+
+func (t *T) M() {
+    if t == nil {
+        fmt.Println("<nil>")
+        return
+    }
+    fmt.Println(t.S)
+}
+
+func main() {
+    var i I     // interface value `i`
+
+    var t *T    // concrete value `t` of type `*T`
+    i = t       // concrete value `t` is not defined & hence, `nil`
+    describe(i)         // (<nil>, *main.T)
+    i.M()               // <nil>
+
+    i = &T{"hello"}
+    describe(i)         // (&{hello}, *main.T)
+    i.M()               // hello
+}
+
+func describe(i I) {
+    fmt.Printf("(%v, %T)\n", i, i)
+}
+```
+
+## Nil interface values
+
+A nil interface value holds neither value nor concrete type.
+
+Calling a method on a nil interface is a run-time error because there is no type inside the interface tuple to indicate which *concrete* method to call.
+
+```go
+// nil-interface-values.go
+package main
+
+import "fmt"
+
+type I interface {
+    M()
+}
+
+func main() {
+    var i I     // interface value not defined, hence `nil`
+    describe(i)
+    i.M()
+}
+
+func describe(i I) {
+    fmt.Printf("(%v, %T)\n", i, i)      // (<nil>, <nil>)
+}
+```
+
+Output:
+
+```go
+(<nil>, <nil>)
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0x492f9f]
+
+goroutine 1 [running]:
+main.main()
+    /tmp/sandbox342319775/prog.go:12 +0x8f
+```
+
+## The empty interface
+
+The interface type that specifies zero methods is known as the *empty interface*:  
+`interface{}`
+
+**An empty interface may hold values of any type**. (Every type implements at least zero methods.)
+
+Empty interfaces are **used by code that handles values of unknown type**. For example, `fmt.Print` takes any number of arguments of type `interface{}`.
+
+```go
+// empty-interface.go
+package main
+
+import "fmt"
+
+func main() {
+    var i interface{}
+    describe(i)     // (<nil>, <nil>)
+
+    i = 42
+    describe(i)     // (42, int)
+
+    i = "hello"
+    describe(i)     // (hello, string)
+}
+
+func describe(i interface{}) {
+    fmt.Printf("(%v, %T)\n", i, i)
+}
+```
+
+## Type assertions
+
+A type assertion provides access to an interface value's underlying concrete value.  
+`t := i.(T)`
+
+This statement asserts that the interface value `i` holds the concrete type `T` and assigns the underlying `T` value to the variable `t`.
+
+If `i` does not hold a `T`, the statement will trigger a panic.
+
+To test whether an interface value holds a specific type, a type assertion can return two values: the underlying value and a boolean value that reports whether the assertion succeeded.  
+`t, ok := i.(T)`
+
+If `i` holds a `T`, then `t` will be the underlying value and `ok` will be `true`.
+
+If not, `ok` will be `false` and `t` will be the zero value of type `T`, and no panic occurs.
+
+Note the similarity between this syntax and that of reading from a map.
+
+```go
+// type-assertions.go
+package main
+
+import "fmt"
+
+func main() {
+    var i interface{} = "hello"
+
+    s := i.(string)
+    fmt.Println(s)      // hello
+
+    s, ok := i.(string)
+    fmt.Println(s, ok)  // hello true
+
+    f, ok := i.(float64)
+    fmt.Println(f, ok)  // 0 false
+
+    f2 := i.(float64)   // panic
+    fmt.Println(f2)
+}
+```
+
+Output:
+
+```text
+hello
+hello true
+0 false
+panic: interface conversion: interface {} is string, not float64
+
+goroutine 1 [running]:
+main.main()
+    /tmp/sandbox754785678/prog.go:17 +0x1f4
+```
+
+## Type switches
+
+A `type switch` is a construct that permits several type assertions in series.
+
+A type switch is like a regular switch statement, but **the cases in a type switch specify types (not values), and those values are compared against the type of the value held by the given interface value**. (This is somewhat similar to `instanceof` in java)
+
+```go
+switch v := i.(type) {
+case T:
+    // here v has type T
+case S:
+    // here v has type S
+default:
+    // no match; here v has the same type as i
+}
+```
+
+The declaration in a type switch has the same syntax as a type assertion `i.(T)`, but the specific type `T` is replaced with the keyword `type`.
+
+This switch statement tests whether the interface value `i` holds a value of type `T` or `S`. In each of the `T` and `S` cases, the variable `v` will be of type `T` or `S` respectively and hold the value held by `i`. In the default case (where there is no match), the variable `v` is of the same interface type and value as `i`.
+
+```go
+// type-switches.go
+package main
+
+import "fmt"
+
+func do(i interface{}) {
+    switch v := i.(type) {
+    case int:
+        fmt.Printf("Twice %v is %v\n", v, v*2)
+    case string:
+        fmt.Printf("%q is %v bytes long\n", v, len(v))
+    default:
+        fmt.Printf("I don't know about type %T!\n", v)
+    }
+}
+
+func main() {
+    do(21)          // Twice 21 is 42
+    do("hello")     // "hello" is 5 bytes long
+    do(true)        // I don't know about type bool!
+}
+```
+
+## Stringers
+
+One of the most ubiquitous interfaces is `Stringer` defined by the `fmt` package.
+
+```go
+type Stringer interface {
+    String() string
+}
+```
+
+A `Stringer` is a type that can describe itself as a string. The `fmt` package (and many others) look for this interface to print values.
+
+The Stringer interface:
+
+```go
+type Stringer interface {
+    String() string
+}
+```
+
+Example Implementation:
+
+```go
+// stringer.go
+package main
+
+import "fmt"
+
+type Person struct {
+    Name string
+    Age  int
+}
+
+/* type Person implicitly implements the Stringer interface
+ * by imlpementing the String() method */
+func (p Person) String() string {
+    return fmt.Sprintf("%v (%v years)", p.Name, p.Age)
+}
+
+func main() {
+    a := Person{"Arthur Dent", 42}
+    z := Person{"Zaphod Beeblebrox", 9001}
+    fmt.Println(a)      // Arthur Dent (42 years)
+    fmt.Println(z)      // Zaphod Beeblebrox (9001 years)
+}
+```
+
+[Blog: All about Go's Stringer interface](https://musse.dev/stringer-golang/)
+
+## Exercise: Stringers
+
+Make the `IPAddr` type implement `fmt.Stringer` to print the address as a dotted quad.
+
+For instance, `IPAddr{1, 2, 3, 4}` should print as `"1.2.3.4"`.
+
+```go
+// exercise-stringer.go
+package main
+
+import "fmt"
+
+type IPAddr [4]byte
+
+// TODO: Add a "String() string" method to IPAddr.
+func (ip IPAddr) String() string {
+    return fmt.Sprintf("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3])
+}
+
+func main() {
+    hosts := map[string]IPAddr{
+        "loopback":  {127, 0, 0, 1},
+        "googleDNS": {8, 8, 8, 8},
+    }
+    for name, ip := range hosts {
+        fmt.Printf("%v: %v\n", name, ip)
+    }
+}
+```
+
+Output:
+
+```text
+loopback: 127.0.0.1
+googleDNS: 8.8.8.8
+```
+
+## Errors
+
+Go programs express error state with `error` values.
+
+The `error` type is a built-in interface similar to `fmt.Stringer`:
+
+```go
+type error interface {
+    Error() string
+}
+```
+
+(As with `fmt.Stringer`, the `fmt` package looks for the `error` interface when printing values.)
+
+Functions often return an `error` value, and calling code should handle errors by testing whether the error equals `nil`.
+
+```go
+i, err := strconv.Atoi("42")
+if err != nil {
+    fmt.Printf("couldn't convert number: %v\n", err)
+    return
+}
+fmt.Println("Converted integer:", i)
+```
+
+A nil `error` denotes success; a non-nil `error` denotes failure.
+
+```go
+// errors.go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+type MyError struct {
+    When time.Time
+    What string
+}
+
+func (e *MyError) Error() string {
+    return fmt.Sprintf("at %v, %s", e.When, e.What)
+}
+
+func run() error {
+    return &MyError{
+        time.Now(),
+        "it didn't work",
+    }
+}
+
+func main() {
+    if err := run(); err != nil {
+        fmt.Println(err)    // at 2009-11-10 23:00:00 +0000 UTC m=+0.000000001, it didn't work
+    }
+}
+```
+
+## Exercise: Errors
+
+Copy your `Sqrt` function from the [earlier exercise](https://tour.golang.org/flowcontrol/8) and modify it to return an `error` value.
+
+`Sqrt` should return a non-nil error value when given a negative number, as it doesn't support complex numbers.
+
+Create a new type  
+`type ErrNegativeSqrt float64`  
+and make it an `error` by giving it a  
+`func (e ErrNegativeSqrt) Error() string`  
+method such that `ErrNegativeSqrt(-2).Error()` returns `"cannot Sqrt negative number: -2"`.
+
+**Note:** A call to `fmt.Sprint(e)` inside the `Error` method will send the program into an infinite loop. You can avoid this by converting e first: `fmt.Sprint(float64(e))`. **Why?**
+
+Change your `Sqrt` function to return an `ErrNegativeSqrt` value when given a negative number.
+
+[**Reason for infinite loop**](https://stackoverflow.com/questions/27474907/why-would-a-call-to-fmt-sprinte-inside-the-error-method-result-in-an-infinit)  
+[Avoiding the infinite loop](https://stackoverflow.com/questions/43450813/go-tour-exercise-errors-using-sprintf-with-f-to-avoid-infinite-recursion)
+
+```go
+// exercise-errors.go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+const delta = 1e-10
+
+type ErrNegativeSqrt float64
+
+func (e ErrNegativeSqrt) Error() string {
+    // return fmt.Sprintf("cannot Sqrt negative number: %v", e)    // infinite loop
+    return fmt.Sprintf("cannot Sqrt negative number: %v", float64(e))
+}
+
+func Sqrt(x float64) (float64, error) {
+    if x < 0 {
+        return 0, ErrNegativeSqrt(x)
+    }
+
+    z := x // guess
+
+    for {
+        n := z - (z*z-x)/(2*z)
+        fmt.Printf("Sqrt: %v", z)
+        fmt.Printf("\tDifference: %v\n", math.Abs(n-z))
+        if diff := math.Abs(n - z); diff < delta {
+            break
+        }
+        z = n
+    }
+
+    return z, nil
+}
+
+func main() {
+    fmt.Println(Sqrt(2))    // 1.4142135623746899 <nil>
+    fmt.Println(Sqrt(-2))   // 0 cannot Sqrt negative number: -2
+}
+```
+
+Output:
+
+```go
+Sqrt: 2    Difference: 0.5
+Sqrt: 1.5    Difference: 0.08333333333333326
+Sqrt: 1.4166666666666667    Difference: 0.002450980392156854
+Sqrt: 1.4142156862745099    Difference: 2.123899820016817e-06
+Sqrt: 1.4142135623746899    Difference: 1.5947243525715749e-12
+1.4142135623746899 <nil>
+0 cannot Sqrt negative number: -2
+```
+
+## Readers
+
+The `io` package specifies the `io.Reader` interface, which represents the read end of a stream of data.
+
+The Go standard library contains [many implementations](https://golang.org/search?q=Read#Global) of these interfaces, including files, network connections, compressors, ciphers, and others.
+
+The `io.Reader` interface has a `Read` method:  
+`func (T) Read(b []byte) (n int, err error)`
+
+`Read` populates the given byte slice with data and returns the number of bytes populated and an error value. It returns an `io.EOF` error when the stream ends.
+
+The [`io.Reader`](https://golang.org/pkg/io/#Reader) interface:
+
+```go
+type Reader interface {
+    Read(p []byte) (n int, err error)
+}
+```
+> Reader is the interface that wraps the basic Read method.
+> 
+>Read reads up to len(p) bytes into p. It returns the number of bytes read (0 <= n <= len(p)) and any error encountered. Even if Read returns n < len(p), it may use all of p as scratch space during the call. If some data is available but not len(p) bytes, Read conventionally returns what is available instead of waiting for more.
+
+>When Read encounters an error or end-of-file condition after successfully reading n > 0 bytes, it returns the number of bytes read. It may return the (non-nil) error from the same call or return the error (and n == 0) from a subsequent call. An instance of this general case is that a Reader returning a non-zero number of bytes at the end of the input stream may return either err == EOF or err == nil. The next Read should return 0, EOF.
+
+>Callers should always process the n > 0 bytes returned before considering the error err. Doing so correctly handles I/O errors that happen after reading some bytes and also both of the allowed EOF behaviors.
+
+>Implementations of Read are discouraged from returning a zero byte count with a nil error, except when len(p) == 0. Callers should treat a return of 0 and nil as indicating that nothing happened; in particular it does not indicate EOF.
+
+> Implementations must not retain p.
+
+The [`string.Reader`](https://golang.org/pkg/strings/#Reader) interface:
+
+```go
+type Reader struct {
+    // contains filtered or unexported fields
+}
+```
+
+>A Reader implements the io.Reader, io.ReaderAt, io.Seeker, io.WriterTo, io.ByteScanner, and io.RuneScanner interfaces by reading from a string. The zero value for Reader operates like a Reader of an empty string.
+
+[**func NewReader**](https://golang.org/pkg/strings/#NewReader)  
+`func NewReader(s string) *Reader`
+>NewReader returns a new Reader reading from s. It is similar to bytes.NewBufferString but more efficient and read-only.
+
+The example below creates a [`strings.Reader`](https://golang.org/pkg/strings/#Reader) and consumes its output 8 bytes at a time.
+
+```go
+// reader.go
+package main
+
+import (
+    "fmt"
+    "io"
+    "strings"
+)
+
+func main() {
+    r := strings.NewReader("Hello, Reader!")
+
+    b := make([]byte, 8)
+    for {
+        n, err := r.Read(b)
+        fmt.Printf("n = %v err = %v b = %v\n", n, err, b)
+        fmt.Printf("b[:n] = %q\n", b[:n])
+        if err == io.EOF {
+            break
+        }
+    }
+}
+```
+
+Output:
+
+```go
+n = 8 err = <nil> b = [72 101 108 108 111 44 32 82]
+b[:n] = "Hello, R"
+n = 6 err = <nil> b = [101 97 100 101 114 33 32 82]
+b[:n] = "eader!"
+n = 0 err = EOF b = [101 97 100 101 114 33 32 82]
+b[:n] = ""
+```
+
+## Exercise: Readers
+
+Implement a `Reader` type that emits an infinite stream of the ASCII character `'A'`.
+
+```go
+package main
+
+import "golang.org/x/tour/reader"
+
+type MyReader struct{}
+
+// TODO: Add a Read([]byte) (int, error) method to MyReader.
+// i.e. Read() must implement the io.Reader interface
+func (r MyReader) Read(b []byte) (n int, e error) {
+    for i := range b {
+        b[i] = 'A'
+    }
+    return len(b), nil
+}
+
+func main() {
+    reader.Validate(MyReader{})
+}
+```
+
+## Exercise: rot13Reader
+
+A common pattern is an [`io.Reader`](https://golang.org/pkg/io/#Reader) that wraps another `io.Reader`, modifying the stream in some way.
+
+For example, the [`gzip.NewReader`](https://golang.org/pkg/compress/gzip/#NewReader) function takes an `io.Reader` (a stream of compressed data) and returns a `*gzip.Reader` that also implements `io.Reader` (a stream of the decompressed data).
+
+Implement a `rot13Reader` that implements `io.Reader` and reads from an `io.Reader`, modifying the stream by applying the [rot13](https://en.wikipedia.org/wiki/ROT13) substitution cipher to all alphabetical characters.
+
+The `rot13Reader` type is provided for you. Make it an `io.Reader` by implementing its `Read` method.
+
+## Images
+
+[Package image](https://golang.org/pkg/image/#Image) defines the `Image` interface:
+
+```go
+package image
+
+type Image interface {
+    // ColorModel returns the Image's color model.
+    ColorModel() color.Model
+    // Bounds returns the domain for which At can return non-zero color.
+    // The bounds do not necessarily contain the point (0, 0).
+    Bounds() Rectangle
+    // At returns the color of the pixel at (x, y).
+    // At(Bounds().Min.X, Bounds().Min.Y) returns the upper-left pixel of the grid.
+    // At(Bounds().Max.X-1, Bounds().Max.Y-1) returns the lower-right one.
+    At(x, y int) color.Color
+}
+```
+
+**Note:** the `Rectangle` return value of the `Bounds` method is actually an `image.Rectangle`, as the declaration is inside package `image`.
+
+(See [the documentation](https://golang.org/pkg/image/#Image) for all the details.)
+
+The `color.Color` and `color.Model` types are also interfaces, but we'll ignore that by using the predefined implementations `color.RGBA` and `color.RGBAModel`. These interfaces and types are specified by the [image/color package](https://golang.org/pkg/image/color/)
+
+```go
+package main
+
+import (
+    "fmt"
+    "image"
+)
+
+func main() {
+    m := image.NewRGBA(image.Rect(0, 0, 100, 100))
+    fmt.Println(m.Bounds())         // (0,0)-(100,100)
+    fmt.Println(m.At(0, 0).RGBA())  // 0 0 0 0
+}
+```
+
+## Exercise: Images
+
+Remember the [picture generator](https://tour.golang.org/moretypes/18) you wrote earlier? Let's write another one, but this time it will return an implementation of `image.Image` instead of a slice of data.
+
+Define your own Image type, implement [the necessary methods](https://golang.org/pkg/image/#Image), and call `pic.ShowImage`.
+
+`Bounds` should return a `image.Rectangle`, like `image.Rect(0, 0, w, h)`.
+
+`ColorModel` should return `color.RGBAModel`.
+
+`At` should return a color; the value `v` in the last picture generator corresponds to `color.RGBA{v, v, 255, 255}` in this one.
+
+```go
+package main
+
+import (
+    "image"
+    "image/color"
+
+    "golang.org/x/tour/pic"
+)
+
+type Image struct {
+    Height, Width int
+}
+
+func (m Image) ColorModel() color.Model {
+    return color.RGBAModel
+}
+
+func (m Image) Bounds() image.Rectangle {
+    return image.Rect(0, 0, m.Height, m.Width)
+}
+
+func (m Image) At(x, y int) color.Color {
+    c := uint8(x ^ y)   // similar to the Slices exercise pattern
+    return color.RGBA{c, c, 255, 255}
+}
+
+func main() {
+    m := Image{256, 256}
+    pic.ShowImage(m)
+}
+```
+
+Output 1 for (x ^ y):
+
+![Output 1](./img/exercise-images.png "Image pattern for x ^ y")  
+
+Output 2 for (x ^ y) * (x ^ y):
+
+![Output 2](./img/slices-pattern.png "Image pattern for (x ^ y) * (x ^ y)")
 
 # Concurrency
 
