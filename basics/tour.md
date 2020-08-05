@@ -1,13 +1,13 @@
-# Resources
-
-[A Tour of GO](https://tour.golang.org)  
-[Go Tour github repo](https://github.com/golang/tour)  
-[Inside the Go Playground - Architecture](https://blog.golang.org/playground)
-
 # ToC
 
-- [Resources](#resources)
 - [ToC](#toc)
+- [Resources](#resources)
+  - [Readings: Blog Posts](#readings-blog-posts)
+    - [Web](#web)
+    - [Interfaces](#interfaces)
+    - [Concurrency](#concurrency)
+    - [Advanced](#advanced)
+    - [Others](#others)
 - [Basics](#basics)
   - [Package, variables and Functions](#package-variables-and-functions)
     - [Imports](#imports)
@@ -74,7 +74,7 @@
   - [Methods and pointer indirection](#methods-and-pointer-indirection)
   - [Methods and pointer indirection (2)](#methods-and-pointer-indirection-2)
   - [Choosing a value or pointer receiver](#choosing-a-value-or-pointer-receiver)
-  - [Interfaces](#interfaces)
+  - [Interfaces](#interfaces-1)
   - [Interfaces are implemented implicitly](#interfaces-are-implemented-implicitly)
   - [Interface values](#interface-values)
   - [Interface values with nil underlying values](#interface-values-with-nil-underlying-values)
@@ -91,7 +91,87 @@
   - [Exercise: rot13Reader](#exercise-rot13reader)
   - [Images](#images)
   - [Exercise: Images](#exercise-images)
-- [Concurrency](#concurrency)
+- [Concurrency](#concurrency-1)
+  - [Goroutines](#goroutines)
+  - [Channels](#channels)
+  - [Buffered Channels](#buffered-channels)
+  - [Range and Close](#range-and-close)
+  - [Select](#select)
+  - [Default Selection](#default-selection)
+  - [Exercise: Equivalent Binary Trees](#exercise-equivalent-binary-trees)
+    - [Solution Code](#solution-code)
+  - [sync.Mutex](#syncmutex)
+  - [Exercise: Web Crawler](#exercise-web-crawler)
+
+# Resources
+
+[A Tour of GO](https://tour.golang.org)  
+[Go Tour github repo](https://github.com/golang/tour)  
+[Inside the Go Playground - Architecture](https://blog.golang.org/playground)  
+[Effective Go - The Go Programming Language](https://golang.org/doc/effective_go.html)  
+[The Go Memory Model](https://golang.org/ref/mem)  
+
+## Readings: Blog Posts
+
+[Go's Declaration Syntax - The Go Blog](https://blog.golang.org/declaration-syntax)  
+[Go Slices: usage and internals - The Go Blog](https://blog.golang.org/slices-intro)  
+[Arrays, slices (and strings): The mechanics of 'append' - The Go Blog](https://blog.golang.org/slices)  
+[SliceTricks · golang/go Wiki · GitHub](https://github.com/golang/go/wiki/SliceTricks)  
+[Go maps in action - The Go Blog](https://blog.golang.org/maps)  
+[Using Go Modules - The Go Blog](https://blog.golang.org/using-go-modules)  
+[research!rsc: Go Data Structures](https://research.swtch.com/godata)  
+[Error handling and Go - The Go Blog](https://blog.golang.org/error-handling-and-go)  
+[Defer, Panic, and Recover - The Go Blog](https://blog.golang.org/defer-panic-and-recover)  
+[Working with Errors in Go 1.13 - The Go Blog](https://blog.golang.org/go1.13-errors)  
+[The Go image package - The Go Blog](https://blog.golang.org/image)  
+[The Go image/draw package - The Go Blog](https://blog.golang.org/image-draw)  
+[Organizing Go code - The Go Blog](https://blog.golang.org/organizing-go-code)  
+[First Class Functions in Go - The Go Blog](https://blog.golang.org/functions-codewalk)  
+[go fmt your code - The Go Blog](https://blog.golang.org/gofmt)  
+[JSON and Go - The Go Blog](https://blog.golang.org/json)  
+[Godoc: documenting Go code - The Go Blog](https://blog.golang.org/godoc)  
+[Testable Examples in Go - The Go Blog](https://blog.golang.org/examples)  
+[The cover story (test coverage) - The Go Blog](https://blog.golang.org/cover)  
+[Go Modules in 2019 - The Go Blog](https://blog.golang.org/modules2019)  
+[A new Go API for Protocol Buffers - The Go Blog](https://blog.golang.org/protobuf-apiv2)  
+[The App Engine SDK and workspaces (GOPATH) - The Go Blog](https://blog.golang.org/appengine-gopath)  
+
+### Web
+
+[Introducing HTTP Tracing - The Go Blog](https://blog.golang.org/http-tracing)  
+[A new Go API for Protocol Buffers - The Go Blog](https://blog.golang.org/protobuf-apiv2)  
+[HTTP/2 Server Push - The Go Blog](https://blog.golang.org/h2push)  
+
+### Interfaces
+
+[A GIF decoder: an exercise in Go interfaces - The Go Blog](https://blog.golang.org/gif-decoder)  
+[JSON-RPC: a tale of interfaces - The Go Blog](https://blog.golang.org/json-rpc)  
+
+### Concurrency
+
+[Concurrency is not parallelism - The Go Blog](https://blog.golang.org/waza-talk)  
+[Go Concurrency Patterns: Rob Pike](https://talks.golang.org/2012/concurrency.slide)  
+[Go Concurrency Patterns: Context - The Go Blog](https://blog.golang.org/context)  
+[Go Concurrency Patterns: Pipelines and cancellation - The Go Blog](https://blog.golang.org/pipelines)  
+[Go Concurrency Patterns: Timing out, moving on - The Go Blog](https://blog.golang.org/concurrency-timeouts)  
+[**Share Memory By Communicating** - The Go Blog](https://blog.golang.org/codelab-share)  
+[Introducing the Go Race Detector - The Go Blog](https://blog.golang.org/race-detector)  
+
+### Advanced
+
+[Understanding Golang Type System – The New Stack](https://thenewstack.io/understanding-golang-type-system/)  
+[Debugging what you deploy in Go 1.12 - The Go Blog](https://blog.golang.org/debug-opt)  
+[The Laws of Reflection - The Go Blog](https://blog.golang.org/laws-of-reflection)  
+[Profiling Go Programs - The Go Blog](https://blog.golang.org/pprof)  
+[Generating code - The Go Blog](https://blog.golang.org/generate)  
+[C? Go? Cgo! - The Go Blog](https://blog.golang.org/cgo)  
+
+### Others
+
+[Introducing Gofix - The Go Blog](https://blog.golang.org/introducing-gofix)  
+[Debugging Go Code with GDB - The Go Programming Language](https://golang.org/doc/gdb)  
+
+---
 
 # Basics
 
@@ -1816,6 +1896,8 @@ Output:
 34
 ```
 
+---
+
 # Methods and interfaces
 
 This lesson covers methods and interfaces, the constructs that define objects and their behavior.
@@ -2641,6 +2723,8 @@ func main() {
 }
 ```
 
+[**Blog: Working with Errors in Go 1.13**](https://blog.golang.org/go1.13-errors)
+
 ## Exercise: Errors
 
 Copy your `Sqrt` function from the [earlier exercise](https://tour.golang.org/flowcontrol/8) and modify it to return an `error` value.
@@ -2803,6 +2887,7 @@ b[:n] = ""
 Implement a `Reader` type that emits an infinite stream of the ASCII character `'A'`.
 
 ```go
+// exercise-reader.go
 package main
 
 import "golang.org/x/tour/reader"
@@ -2832,6 +2917,49 @@ For example, the [`gzip.NewReader`](https://golang.org/pkg/compress/gzip/#NewRea
 Implement a `rot13Reader` that implements `io.Reader` and reads from an `io.Reader`, modifying the stream by applying the [rot13](https://en.wikipedia.org/wiki/ROT13) substitution cipher to all alphabetical characters.
 
 The `rot13Reader` type is provided for you. Make it an `io.Reader` by implementing its `Read` method.
+
+```go
+// exercise-rot13-reader.go
+package main
+
+import (
+    "io"
+    "os"
+    "strings"
+)
+
+type rot13Reader struct {
+    r io.Reader
+}
+
+func (r rot13Reader) Read(p []byte) (n int, e error) {
+    n, e = r.r.Read(p)
+    for i := 0; i < n; i++ {
+        p[i] = rot13(p[i])
+    }
+    return
+}
+
+func main() {
+    s := strings.NewReader("Lbh penpxrq gur pbqr!")
+    r := rot13Reader{s}
+    io.Copy(os.Stdout, &r)
+}
+
+func rot13(b byte) byte {
+    var a, z byte
+    switch {
+    case 'a' <= b && b <= 'z':
+        a, z = 'a', 'z'
+    case 'A' <= b && b <= 'Z':
+        a, z = 'A', 'Z'
+    default:
+        return b
+    }
+    return (b-a+13) % (z-a+1) + a
+    // return (b-a+13) % 26 + a
+}
+```
 
 ## Images
 
@@ -2887,12 +3015,12 @@ Define your own Image type, implement [the necessary methods](https://golang.org
 `At` should return a color; the value `v` in the last picture generator corresponds to `color.RGBA{v, v, 255, 255}` in this one.
 
 ```go
+// exercise-images.go
 package main
 
 import (
     "image"
     "image/color"
-
     "golang.org/x/tour/pic"
 )
 
@@ -2927,8 +3055,654 @@ Output 2 for (x ^ y) * (x ^ y):
 
 ![Output 2](./img/slices-pattern.png "Image pattern for (x ^ y) * (x ^ y)")
 
+[**Read: The Go Image Package (The Go Blog)**](https://blog.golang.org/image)
+
+---
+
 # Concurrency
 
 Go provides concurrency features as part of the core language.
 
 This module goes over goroutines and channels, and how they are used to implement different concurrency patterns.
+
+## Goroutines
+
+A goroutine is a **lightweight thread** managed by the Go runtime.  
+
+`go f(x, y, z)`  
+starts a new goroutine running
+
+`f(x, y, z)`  
+The evaluation of `f`, `x`, `y`, and `z` happens in the current goroutine and the execution of `f` happens in the new goroutine.
+
+Goroutines run in the same address space, so **access to shared memory must be synchronized**. The sync package provides useful primitives, although you won't need them much in Go as there are other primitives. (See the next slide.)
+
+```go
+// goroutines.go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func say(s string) {
+    for i := 0; i < 5; i++ {
+        time.Sleep(100 * time.Millisecond)
+        fmt.Println(s)
+    }
+}
+
+func main() {
+    go say("world")
+    say("hello")
+}
+```
+
+Output:
+
+```text
+world
+hello
+hello
+world
+hello
+world
+hello
+world
+hello
+```
+
+## Channels
+
+Channels are a typed conduit through which you can send and receive values with the channel operator, <-.
+
+```go
+ch <- v    // Send v to channel ch.
+v := <-ch  // Receive from ch, and
+           // assign value to v.
+```
+
+(The data flows in the direction of the arrow.)
+
+Like maps and slices, channels must be created before use:  
+`ch := make(chan int)`  
+By default, **sends and receives block** until the other side is ready. This **allows goroutines to synchronize without explicit locks or condition variables**.
+
+This means that:
+
+- sending is blocked until receiver is registered
+- receiving is blocked unless sender is registered
+
+The example code sums the numbers in a slice, distributing the work between two goroutines. Once both goroutines have completed their computation, it calculates the final result.
+
+```go
+// channels.go
+package main
+
+import "fmt"
+
+func sum(s []int, c chan int) {
+    sum := 0
+    for _, v := range s {
+        sum += v
+    }
+    c <- sum // send sum to c
+}
+
+func main() {
+    s := []int{7, 2, 8, -9, 4, 0}
+
+    c := make(chan int)
+    go sum(s[:len(s)/2], c)
+    go sum(s[len(s)/2:], c)
+    x, y := <-c, <-c // receive from c
+
+    fmt.Println(x, y, x+y)  // -5 17 12
+}
+```
+
+## Buffered Channels
+
+Channels can be *buffered*. Provide the buffer length as the second argument to make to initialize a buffered channel:  
+`ch := make(chan int, 100)`  
+Sends to a buffered channel block only when the buffer is full (can't send if no space in buffer).  
+Receives block when the buffer is empty (nothing to receive).
+
+Modify the example to overfill the buffer and see what happens.
+
+```go
+// buffered-channels.go
+package main
+
+import "fmt"
+
+func main() {
+    ch := make(chan int, 2)
+    ch <- 1
+    ch <- 2
+    // ch <- 3     // fatal error: all goroutines are asleep - deadlock!
+    fmt.Println(<-ch)   // 1
+    fmt.Println(<-ch)   // 2
+}
+```
+
+## Range and Close
+
+A sender can `close` a channel to indicate that no more values will be sent. Receivers can test whether a channel has been closed by assigning a second parameter to the receive expression: after  
+`v, ok := <-ch`  
+`ok` is `false` if there are no more values to receive and the channel is closed.
+
+The loop `for i := range c` receives values from the channel repeatedly until it is closed.
+
+**Note:** Only the sender should close a channel, never the receiver. Sending on a closed channel will cause a panic.
+
+**Another note:** Channels aren't like files; you don't usually need to close them. Closing is only necessary when the receiver must be told there are no more values coming, such as to terminate a `range` loop.
+
+```go
+// range-and-close.go
+package main
+
+import (
+    "fmt"
+)
+
+func fibonacci(n int, c chan int) {
+    x, y := 0, 1
+    for i := 0; i < n; i++ {
+        c <- x // send value into c
+        x, y = y, x+y
+    }
+    close(c) // required to terminate range over channel
+}
+
+func main() {
+    c := make(chan int, 10)
+    // The cap built-in function returns the capacity of v, according to its type:
+    // For Channel: the channel buffer capacity, in units of elements
+    go fibonacci(cap(c), c)
+
+    // range over channel
+    for i := range c {
+        fmt.Println(i)
+    }
+}
+```
+
+Output:
+
+```text
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+```
+
+## Select
+
+The `select` statement lets a goroutine wait on multiple communication operations.
+
+A `select` *blocks until one of its cases can run*, then it executes that case. It *chooses one at random if multiple* are ready.
+
+```go
+// select.go
+package main
+
+import "fmt"
+
+func fibonacci(c, quit chan int) {
+    x, y := 0, 1
+    for {
+        select {
+        case c <- x:
+            x, y = y, x+y
+        case <- quit:
+            fmt.Println("quit")
+            return
+        }
+    }
+}
+
+func main() {
+    c := make(chan int)
+    quit := make(chan int)
+    go func() {
+        for i := 0; i < 10; i++ {
+            fmt.Println(<-c)
+        }
+        quit <- 0
+    }() // way to call goroutine/anon-func just after defining it
+    fibonacci(c, quit)
+    // notice that here the gouroutine func() and fibonacci() have been 
+    // synchronised without any locks, with the help of channels
+}
+```
+
+Output:
+
+```text
+0
+1
+1
+2
+3
+5
+8
+13
+21
+34
+quit
+```
+
+## Default Selection
+
+The `default` case in a `select` is run if no other case is ready.
+
+Use a `default` case to try a send or receive without blocking:
+
+```go
+select {
+case i := <-c:
+    // use i
+default:
+    // receiving from c would block
+}
+```
+
+```go
+// default-select.go
+package main
+
+import (
+    "fmt"
+    "time"
+)
+
+func main() {
+    // TODO: read up on timers and tickers
+    // sends to channel every 100ms
+    tick := time.Tick(100 * time.Millisecond)
+    // After waits for the duration to elapse and then sends the current time
+    boom := time.After(500 * time.Millisecond)
+    for {
+        select {
+        case <-tick:
+            fmt.Println("tick.")
+        case <-boom:
+            fmt.Println("BOOM!")
+            return
+        default:
+            fmt.Println("    .")
+            time.Sleep(50 * time.Millisecond)
+        }
+    }
+}
+```
+
+Output:
+
+```text
+    .
+    .
+tick.
+    .
+    .
+tick.
+    .
+    .
+tick.
+    .
+    .
+tick.
+    .
+    .
+tick.
+BOOM!
+```
+
+**TODO**: read up on [timers](https://gobyexample.com/) and [tickers](https://programming.guide/go/time-reset-wait-stop-timeout-cancel-interval.html)
+
+## Exercise: Equivalent Binary Trees
+There can be many different binary trees with the same sequence of values stored in it. For example, here are two binary trees storing the sequence 1, 1, 2, 3, 5, 8, 13.  
+![Tree](./img/tree.png "Binary Trees")  
+
+A function to check whether two binary trees store the same sequence is quite complex in most languages. We'll use Go's concurrency and channels to write a simple solution.
+
+This example uses the `tree` package, which defines the type:
+
+```go
+type Tree struct {
+    Left  *Tree
+    Value int
+    Right *Tree
+}
+```
+
+Todo:
+
+1. Implement the `Walk` function.
+2. Test the `Walk` function.  
+   - The function `tree.New(k)` constructs a randomly-structured (but always sorted) binary tree holding the values `k, 2k, 3k, ..., 10k`.  
+   - Create a new channel `ch` and kick off the walker: `go Walk(tree.New(1), ch)`  
+   - Then read and print `10` values from the channel. It should be the numbers `1, 2, 3, ..., 10`.
+3. Implement the `Same` function using `Walk` to determine whether `t1` and `t2` store the same values.
+4. Test the `Same` function.  
+`Same(tree.New(1), tree.New(1))` should return `true`, and `Same(tree.New(1), tree.New(2))` should return `false`.
+
+The documentation for `Tree` can be found [here](https://pkg.go.dev/golang.org/x/tour/tree?tab=doc). 
+
+### Solution Code
+
+```go
+// exercise-equivalent-binary-trees.go
+
+package main
+
+import (
+    "fmt"
+
+    "golang.org/x/tour/tree"
+)
+
+// Walk walks the tree t sending all values
+// from the tree to the channel ch.
+func Walk(t *tree.Tree, ch chan int) {
+    WalkHelper(t, ch)
+    close(ch)
+}
+
+// Implements recursion logic for in-order tree traversal
+func WalkHelper(t *tree.Tree, ch chan int) {
+    if t == nil {
+        return
+    }
+    WalkHelper(t.Left, ch)
+    ch <- t.Value
+    WalkHelper(t.Right, ch)
+}
+
+// Same determines whether the trees
+// t1 and t2 contain the same values.
+// NOTE: The implementation leaks goroutines when trees are different.
+// See exercise-equivalent-binary-trees-quit.go for a better solution.
+// The leak happens coz Same() terminates early when trees are different
+// so one of the Walk() goroutines is blocked forever waiting for receiver
+// of the remaining values of the bigger tree to be passed into its channel
+// https://www.ardanlabs.com/blog/2018/11/goroutine-leaks-the-forgotten-sender.html
+func Same(t1, t2 *tree.Tree) bool {
+    c1, c2 := make(chan int), make(chan int)
+
+    go Walk(t1, c1)
+    go Walk(t2, c2)
+
+    for {
+        v1, ok1 := <-c1
+        v2, ok2 := <-c2
+
+        if !ok1 || !ok2 {
+            return ok1 == ok2 // true if both end together
+        }
+        if v1 != v2 {
+            return false
+        }
+    }
+}
+
+func main() {
+    // TestWalk()
+    fmt.Print("tree.New(1) == tree.New(1): ")
+    if Same(tree.New(1), tree.New(1)) {
+        fmt.Println("PASSED")
+    } else {
+        fmt.Println("FAILED")
+    }
+
+    fmt.Print("tree.New(1) != tree.New(2): ")
+    if !Same(tree.New(1), tree.New(2)) {
+        fmt.Println("PASSED")
+    } else {
+        fmt.Println("FAILED")
+    }
+}
+
+func TestWalk() {
+    ch := make(chan int)
+    go Walk(tree.New(1), ch)
+    for i := range ch {
+        fmt.Println(i)
+    }
+}
+```
+
+Leak-free version:
+
+```go
+// exercise-equivalent-binary-trees-quit.go
+package main
+
+import (
+    "fmt"
+
+    "golang.org/x/tour/tree"
+)
+
+// Walk walks the tree t sending all values
+// from the tree to the channel ch.
+func Walk(t *tree.Tree, ch chan int, quit chan int) {
+    WalkHelper(t, ch, quit)
+    close(ch)
+}
+
+// Implements recursion logic for in-order tree traversal
+func WalkHelper(t *tree.Tree, ch chan int, quit chan int) {
+    if t == nil {
+        return
+    }
+    WalkHelper(t.Left, ch, quit)
+    select {
+    case ch <- t.Value:
+        // value sent to channel successfully
+    case <-quit:
+        return
+    }
+    WalkHelper(t.Right, ch, quit)
+}
+
+// Same determines whether the trees
+// t1 and t2 contain the same values.
+func Same(t1, t2 *tree.Tree) bool {
+    c1, c2, quit := make(chan int), make(chan int), make(chan int)
+    defer close(quit)
+
+    go Walk(t1, c1, quit)
+    go Walk(t2, c2, quit)
+
+    for {
+        v1, ok1 := <-c1
+        v2, ok2 := <-c2
+
+        if !ok1 || !ok2 {
+            return ok1 == ok2 // true if both end together
+        }
+        if v1 != v2 {
+            return false
+        }
+    }
+}
+
+func main() {
+    fmt.Print("tree.New(1) == tree.New(1): ")
+    if Same(tree.New(1), tree.New(1)) {
+        fmt.Println("PASSED")
+    } else {
+        fmt.Println("FAILED")
+    }
+
+    fmt.Print("tree.New(1) != tree.New(2): ")
+    if !Same(tree.New(1), tree.New(2)) {
+        fmt.Println("PASSED")
+    } else {
+        fmt.Println("FAILED")
+    }
+}
+```
+
+## sync.Mutex
+
+We've seen how channels are great for communication among goroutines.
+
+But what if we don't need communication? What if we just want to make sure only one goroutine can access a variable at a time to avoid conflicts?
+
+This concept is called [*mutual exclusion*](https://en.wikipedia.org/wiki/Mutual_exclusion), and the conventional name for the **data structure** that provides it is [***mutex***](https://searchnetworking.techtarget.com/definition/mutex).
+
+Go's standard library provides mutual exclusion with `sync.Mutex` and its two methods:  
+`Lock`  
+`Unlock`  
+We can define a block of code to be executed in mutual exclusion by surrounding it with a call to `Lock` and `Unlock` as shown on the Inc method.
+
+We can also use `defer` to ensure the mutex will be unlocked as in the `Value` method.
+
+```go
+// mutex-counter.go
+package main
+
+import (
+    "fmt"
+    "sync"
+    "time"
+)
+
+// SafeCounter is safe to use concurrently.
+type SafeCounter struct {
+    v   map[string]int
+    mux sync.Mutex
+}
+
+// Inc increments the counter for the given key.
+func (c *SafeCounter) Inc(key string) {
+    c.mux.Lock()
+    // Lock so only one goroutine at a time can access the map c.v.
+    c.v[key]++
+    c.mux.Unlock()
+}
+
+// Value returns the current value of the counter for the given key.
+func (c *SafeCounter) Value(key string) int {
+    c.mux.Lock()
+    // Lock so only one goroutine at a time can access the map c.v.
+    defer c.mux.Unlock()    // will be executed at the end of the enclosing function 
+    return c.v[key]
+}
+
+func main() {
+    c := SafeCounter{v: make(map[string]int)}
+    for i := 0; i < 1000; i++ {
+        go c.Inc("somekey") // locking with mutex prevents race conditions
+    }
+
+    time.Sleep(time.Second)
+    fmt.Println(c.Value("somekey"))     // 1000
+}
+```
+
+## Exercise: Web Crawler
+
+In this exercise you'll use Go's concurrency features to parallelize a web crawler.
+
+Modify the `Crawl` function to fetch URLs in parallel without fetching the same URL twice.
+
+*Hint*: you can keep a cache of the URLs that have been fetched on a map, but maps alone are not safe for concurrent use!
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+type Fetcher interface {
+    // Fetch returns the body of URL and
+    // a slice of URLs found on that page.
+    Fetch(url string) (body string, urls []string, err error)
+}
+
+// Crawl uses fetcher to recursively crawl
+// pages starting with url, to a maximum of depth.
+func Crawl(url string, depth int, fetcher Fetcher) {
+    // TODO: Fetch URLs in parallel.
+    // TODO: Don't fetch the same URL twice.
+    // This implementation doesn't do either:
+    if depth <= 0 {
+        return
+    }
+    body, urls, err := fetcher.Fetch(url)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+    fmt.Printf("found: %s %q\n", url, body)
+    for _, u := range urls {
+        Crawl(u, depth-1, fetcher)
+    }
+    return
+}
+
+func main() {
+    Crawl("https://golang.org/", 4, fetcher)
+}
+
+// fakeFetcher is Fetcher that returns canned results.
+type fakeFetcher map[string]*fakeResult
+
+type fakeResult struct {
+    body string
+    urls []string
+}
+
+func (f fakeFetcher) Fetch(url string) (string, []string, error) {
+    if res, ok := f[url]; ok {
+        return res.body, res.urls, nil
+    }
+    return "", nil, fmt.Errorf("not found: %s", url)
+}
+
+// fetcher is a populated fakeFetcher.
+var fetcher = fakeFetcher{
+    "https://golang.org/": &fakeResult{
+        "The Go Programming Language",
+        []string{
+            "https://golang.org/pkg/",
+            "https://golang.org/cmd/",
+        },
+    },
+    "https://golang.org/pkg/": &fakeResult{
+        "Packages",
+        []string{
+            "https://golang.org/",
+            "https://golang.org/cmd/",
+            "https://golang.org/pkg/fmt/",
+            "https://golang.org/pkg/os/",
+        },
+    },
+    "https://golang.org/pkg/fmt/": &fakeResult{
+        "Package fmt",
+        []string{
+            "https://golang.org/",
+            "https://golang.org/pkg/",
+        },
+    },
+    "https://golang.org/pkg/os/": &fakeResult{
+        "Package os",
+        []string{
+            "https://golang.org/",
+            "https://golang.org/pkg/",
+        },
+    },
+}
+```
