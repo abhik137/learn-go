@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 )
 
 type Fetcher interface {
@@ -12,13 +13,43 @@ type Fetcher interface {
 
 // Crawl uses fetcher to recursively crawl
 // pages starting with url, to a maximum of depth.
-func Crawl(url string, depth int, fetcher Fetcher) {
-	// TODO: Fetch URLs in parallel.
-	// TODO: Don't fetch the same URL twice.
-	// This implementation doesn't do either:
-	if depth <= 0 {
+// func Crawl(url string, depth int, fetcher Fetcher) {
+// 	// TODO: Fetch URLs in parallel.
+// 	// TODO: Don't fetch the same URL twice.
+// 	// This implementation doesn't do either:
+// 	if depth <= 0 {
+// 		return
+// 	}
+// 	body, urls, err := fetcher.Fetch(url)
+// 	if err != nil {
+// 		fmt.Println(err)
+// 		return
+// 	}
+// 	fmt.Printf("found: %s %q\n", url, body)
+// 	for _, u := range urls {
+// 		Crawl(u, depth-1, fetcher)
+// 	}
+// 	return
+// }
+
+//
+// Concurrent crawler with shared state and mutex
+//
+type fetchState struct {
+	mu      sync.Mutex      // mutex is in this struct only for convenience, it's not required
+	fetched map[string]bool // Map of fetched urls
+}
+
+func MutexCrawl(url string, fetcher Fetcher, f *fetchState) {
+	f.mu.Lock() // Lock needed so that 2 different threads can't fetch at the same time
+	isFetched := f.fetched[url]
+	f.fetched[ur] = true // change state after fetching current status as it will be processed if not fetched
+	f.mu.Unlock()
+
+	if isFetched {
 		return
 	}
+
 	body, urls, err := fetcher.Fetch(url)
 	if err != nil {
 		fmt.Println(err)
@@ -26,9 +57,9 @@ func Crawl(url string, depth int, fetcher Fetcher) {
 	}
 	fmt.Printf("found: %s %q\n", url, body)
 	for _, u := range urls {
-		Crawl(u, depth-1, fetcher)
+		go MutexCrawl(u, fetcher, f)
 	}
-	return
+
 }
 
 func main() {
